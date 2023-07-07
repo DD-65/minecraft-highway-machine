@@ -15,5 +15,6 @@ This is where the Highway Machine comes in clutch: You tell it where it should b
 - minecraft mod/datapack (?)
 - more customisation
 ## Limitatioms
+- works only in MacOS as I didn’t bother to write the copy-to-clipboard-code for multiple platforms lol (will do promise)
 - Can't build highways underwater/in lava as it will flow in from outside -> "Underwater" mode (?)
 - Player must have OP & must go in creative mode due to Command Block (command is too long to be run in chat)
