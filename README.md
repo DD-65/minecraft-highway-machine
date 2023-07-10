@@ -16,3 +16,4 @@ This is where the Highway Machine comes in clutch: You tell it where it should b
 - more customisation
 ## Limitatioms
 - Player must have OP & must go in creative mode due to Command Block (command is too long to be run in chat)
+- only works in simulation distance
