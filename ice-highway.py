@@ -1,5 +1,5 @@
 import random
-import subprocess
+import subprocess, platform
 commands=[]
 # standard-bau-blöcke
 global buildingblock, lightingblock
@@ -15,8 +15,11 @@ def settings():
         eingabelicht = str(input("Beleuchtungsblock? BlockID, leer für Standard:"))
         if eingabelicht != "" and eingabelicht != " ":
             lightingblock = eingabelicht
+    
+    
     else:
         pass
+
 # INITIALISIEREN
 def initialisierung():
     global xstart, ystart, zstart, xziel, yziel, zziel, punkt1, punkt2
@@ -32,13 +35,22 @@ def initialisierung():
         # keine/ungültige Koordinaten
         print("Koordinaten ungültig.")
         initialisierung()
-    punkt2=str(input("Zielkoordinaten im Format XXX YYY ZZZ:"))
+    punkt2=str(input("Zielkoordinaten im Format XXX YYY ZZZ; - für gleiche Koordinaten:"))
     koords2=punkt2.split(sep=" ")
     try:
         # konvertieren der eingegebenen ZielKoordinaten zu int
-        xziel=int(koords2[0])
-        yziel=int(koords2[1])
-        zziel=int(koords2[2])
+        if koords2[0]=="-":
+            xziel=xstart
+        else:
+            xziel=int(koords2[0])
+        if koords2[1]=="-":
+            yziel=ystart
+        else:
+            yziel=int(koords2[1])
+        if koords2[2]=="-":
+            zziel=zstart
+        else:
+            zziel=int(koords2[2])
     except ValueError:
         # keine/ungültige Koordinaten
         print("Koordinaten ungültig.")
@@ -79,23 +91,23 @@ commands.append(command)
 #QUARZ-WÄNDE
 if xrichtung==True:
     #erste wand
-    von = "{} {} {}".format(xstart + 2, ystart + 1, zstart)
+    von = "{} {} {}".format(xstart + 2, ystart + 2, zstart)
     bis = "{} {} {}".format(xziel + 2, yziel, zziel)
     command="/fill {von} {bis} {buildingblock}".format(**locals())
     commands.append(command)
     #zweite wand
-    von = "{} {} {}".format(xstart - 2, ystart + 1, zstart)
+    von = "{} {} {}".format(xstart - 2, ystart + 2, zstart)
     bis = "{} {} {}".format(xziel - 2, yziel, zziel)
     command="/fill {von} {bis} {buildingblock}".format(**locals())
     commands.append(command)
 else:
     #erste wand
-    von = "{} {} {}".format(xstart, ystart + 1, zstart + 2)
+    von = "{} {} {}".format(xstart, ystart + 2, zstart + 2)
     bis = "{} {} {}".format(xziel, yziel, zziel + 2)
     command="/fill {von} {bis} {buildingblock}".format(**locals())
     commands.append(command)
     #zweite wand
-    von = "{} {} {}".format(xstart, ystart + 1, zstart - 2)
+    von = "{} {} {}".format(xstart, ystart + 2, zstart - 2)
     bis = "{} {} {}".format(xziel, yziel, zziel - 2)
     command="/fill {von} {bis} {buildingblock}".format(**locals())
     commands.append(command)
@@ -115,26 +127,6 @@ von = "{} {} {}".format(xstart, ystart + 3, zstart)
 bis = "{} {} {}".format(xziel, yziel + 3, zziel)
 command="/fill {von} {bis} {lightingblock}".format(**locals())
 commands.append(command)
-
-# #TREPPEN - niemand jucken treppen
-# #erste treppen
-# if xrichtung==True:
-#     von = "{} {} {}".format(xstart - 1, ystart, zstart - 1)
-#     bis = "{} {} {}".format(xstart + 1, yziel, zstart - 1)
-# else:
-#     von = "{} {} {}".format(xziel - 1, ystart, zziel - 1)
-#     bis = "{} {} {}".format(xziel - 1, yziel, zziel + 1)
-# command="/fill {von} {bis} quartz_stairs".format(**locals())
-# commands.append(command)
-# #zweite treppen
-# if xrichtung==True:
-#     von = "{} {} {}".format(xstart - 1, ystart, zstart + 1)
-#     bis = "{} {} {}".format(xstart + 1, yziel, zstart + 1)
-# else:
-#     von = "{} {} {}".format(xziel + 1, ystart, zziel - 1)
-#     bis = "{} {} {}".format(xziel + 1, yziel, zziel + 1)
-# command="/fill {von} {bis} quartz_stairs".format(**locals())
-# commands.append(command)
 
 ##ALLES IN EINEN COMMAND
 grosser_command="""/summon falling_block ~ ~2 ~ {Time:1,BlockState:{Name:"command_block"},TileEntityData:{auto:1,Command:"%s}"}""" % (commands[0])
@@ -157,7 +149,16 @@ for i in range(0, len(commands)*2):
     grosser_command=grosser_command+"]}"
 grosser_command+="]}]}"
 
-subprocess.run("pbcopy", text=True, input=grosser_command)
+system = platform.system()
+
+if system == 'Darwin':  # MacOS
+    subprocess.run("pbcopy", text=True, input=text, check=True)
+elif system == 'Linux':  # Linux
+    subprocess.run("xclip", input=text, check=True)
+elif system == 'Windows':  # Windows
+    subprocess.run("clip", input=text, check=True)
+else:
+    raise OSError(f"Unsupported operating system: {system}")
 """
 summon falling_block ~ ~2 ~ {Time:1,BlockState:{Name:"command_block"},TileEntityData:{auto:1,Command:"say 1"}
 ,Passengers:[{id:"armor_stand",Health:0
